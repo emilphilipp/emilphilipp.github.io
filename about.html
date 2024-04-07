@@ -11,7 +11,7 @@
 
 
 
-<title>About me</title>
+<title>Projects</title>
 
 <script src="site_libs/header-attrs-2.14/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
@@ -300,14 +300,42 @@ $(document).ready(function () {
 
 
 
-<h1 class="title toc-ignore">About me</h1>
+<h1 class="title toc-ignore">Projects</h1>
 
 </div>
 
 
-<div id="header" class="section level2">
-<h2>Header</h2>
-<p>Say more about you here.</p>
+<div id="open-street-map-data-and-elevation" class="section level2">
+<h2>Open Street Map Data and Elevation</h2>
+<p>The goal of this project is mainly to practice using OpenStreetMap
+data and calculate optimal routes on networks such as streets. To get
+some experience in this area, I want to answer the question,</p>
+<pre class="r"><code># https://norbertrenner.de/osm/bbox.html
+
+brb_bbox=           c(  11.513,47.615,12.081,47.881)
+
+# Get brb netowrk from osm
+brb_netz &lt;- opq(bbox =brb_bbox) %&gt;%  add_osm_features(features=list(&quot;railway&quot;=&quot;rail&quot;,
+                                                                                                     &quot;public_transport&quot;=&quot;station&quot;)) %&gt;% 
+  osmdata_sf()
+
+brb_stations &lt;-  brb_netz$osm_points %&gt;% filter(!is.na(name)&amp;train==&quot;yes&quot;) 
+# Remove stations which are inside the bounding box but don&#39;t belong to the routes of interest (in the Northeastern quadrant, train towards Rosenheim)
+brb_stations &lt;- brb_stations %&gt;% cbind(st_coordinates(brb_stations)) %&gt;% filter(!(X&gt;11.85&amp;Y&gt;47.84)&amp;X&lt;12.04)
+# Remove duplicate station points
+brb_stations &lt;- brb_stations %&gt;% group_by(name) %&gt;% filter(row_number()==1) %&gt;% ungroup()
+# Remove some more duplicates which have a second platform
+brb_stations &lt;- brb_stations %&gt;% filter(!grepl(pattern=&quot;Gleis&quot;,name))
+
+# Now the railways for the plots
+brb_rails &lt;- brb_netz$osm_lines
+# Cannot simply duplicate as with the points since the lines have multiple coordinates per line --&gt; select one point by line
+rail_cords &lt;-st_coordinates(brb_rails) %&gt;%data.frame() %&gt;%  group_by(L1) %&gt;% filter(row_number()==1)
+brb_rails &lt;- brb_rails %&gt;%cbind(rail_cords) %&gt;% filter(!(X&gt;11.85&amp;Y&gt;47.84)&amp;X&lt;12.04)
+ggplot(brb_rails)+geom_sf()+geom_sf(data = brb_stations)+geom_sf_text(data = brb_stations,aes(label=name))</code></pre>
+<pre><code>## Warning in st_point_on_surface.sfc(sf::st_zm(x)): st_point_on_surface may not
+## give correct results for longitude/latitude data</code></pre>
+<p><img src="about_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
 </div>
 
 

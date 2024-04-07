@@ -1,7 +1,43 @@
 ---
-title: "About me"
+title: "Projects"
 ---
 
-## Header
+## Open Street Map Data and Elevation
 
-Say more about you here.
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(message = FALSE)
+rm(list=ls())
+library(pacman)
+p_load(tidyverse,elevatr,sf,rayshader,raster,terra,osmdata,parallel,dodgr)
+
+# https://www.tylermw.com/posts/data_visualization/adding-open-street-map-data-to-rayshader-maps-in-r.html
+# https://norbertrenner.de/osm/bbox.html
+```
+The goal of this project is mainly to practice using OpenStreetMap data and calculate optimal routes on networks such as streets. To get some experience in this area, I want to answer the question,  
+
+```{r include=T}
+# https://norbertrenner.de/osm/bbox.html
+
+brb_bbox=			c(	11.513,47.615,12.081,47.881)
+
+# Get brb netowrk from osm
+brb_netz <- opq(bbox =brb_bbox) %>%  add_osm_features(features=list("railway"="rail",
+                                                                                                     "public_transport"="station")) %>% 
+  osmdata_sf()
+
+brb_stations <-  brb_netz$osm_points %>% filter(!is.na(name)&train=="yes") 
+# Remove stations which are inside the bounding box but don't belong to the routes of interest (in the Northeastern quadrant, train towards Rosenheim)
+brb_stations <- brb_stations %>% cbind(st_coordinates(brb_stations)) %>% filter(!(X>11.85&Y>47.84)&X<12.04)
+# Remove duplicate station points
+brb_stations <- brb_stations %>% group_by(name) %>% filter(row_number()==1) %>% ungroup()
+# Remove some more duplicates which have a second platform
+brb_stations <- brb_stations %>% filter(!grepl(pattern="Gleis",name))
+
+# Now the railways for the plots
+brb_rails <- brb_netz$osm_lines
+# Cannot simply duplicate as with the points since the lines have multiple coordinates per line --> select one point by line
+rail_cords <-st_coordinates(brb_rails) %>%data.frame() %>%  group_by(L1) %>% filter(row_number()==1)
+brb_rails <- brb_rails %>%cbind(rail_cords) %>% filter(!(X>11.85&Y>47.84)&X<12.04)
+ggplot(brb_rails)+geom_sf()+geom_sf(data = brb_stations)+geom_sf_text(data = brb_stations,aes(label=name))
+
+```
