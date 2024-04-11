@@ -32,6 +32,13 @@
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<script src="site_libs/core-js-2.5.3/shim.min.js"></script>
+<script src="site_libs/react-18.2.0/react.min.js"></script>
+<script src="site_libs/react-18.2.0/react-dom.min.js"></script>
+<script src="site_libs/reactwidget-1.0.0/react-tools.js"></script>
+<script src="site_libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+<link href="site_libs/reactable-0.4.4/reactable.css" rel="stylesheet" />
+<script src="site_libs/reactable-binding-0.4.4/reactable.js"></script>
 <link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
 <link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
 
@@ -243,7 +250,7 @@ $(document).ready(function () {
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="index.html">EmilPhilipp</a>
+      <a class="navbar-brand" href="index.html">Emil Philipp</a>
     </div>
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
@@ -259,13 +266,6 @@ $(document).ready(function () {
     <span class="fa fa-user"></span>
      
     Projects
-  </a>
-</li>
-<li>
-  <a href="cv.html">
-    <span class="fa fa-file-pdf-o"></span>
-     
-    CV
   </a>
 </li>
       </ul>
@@ -335,7 +335,7 @@ brb_stations &lt;- brb_stations %&gt;% group_by(name) %&gt;% filter(row_number()
 # Remove some more duplicates which have a second platform
 brb_stations &lt;- brb_stations %&gt;% filter(!grepl(pattern=&quot;Gleis&quot;,name))</code></pre>
 <p>The area of interest looks as follows:</p>
-<p><img src="about_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<p><img src="about_files/figure-html/unnamed-chunk-2-1.png" width="2450" /></p>
 <p>Next, I want to load additional data on lakes and peaks from OSM for
 further plots and calculations:</p>
 <pre class="r"><code># Lakes come in both polygon and multipolygons in the osm data (depends on whether the lake is just one surface or has a smaller additional parrt)
@@ -363,8 +363,8 @@ brb_elevation_zoom &lt;- crop(brb_elevation,extent(brb_bbox))
 brb_elevation_mat &lt;- raster_to_matrix(brb_elevation_zoom)</code></pre>
 <p>Next, I want to give a more intuitive visual representation of the
 area of interest including the elevation profile. To do this, I use the
-package <a href="https://www.rayshader.com">rayshader</a>.
-<img src="about_files/figure-html/unnamed-chunk-5-1.png" width="2450" />
+package <a href="https://www.rayshader.com">rayshader</a>.</p>
+<p><img src="about_files/figure-html/unnamed-chunk-5-1.png" width="2450" />
 <!-- ![](brb_plot.png){width="125%"} --></p>
 <div id="calculating-the-optimal-station" class="section level3">
 <h3>Calculating the optimal station</h3>
@@ -423,127 +423,8 @@ colnames(out) &lt;- c(paste(&quot;distance&quot;,elevation_gain,sep = &quot;_&qu
 brb_stations &lt;- cbind(brb_stations,out) </code></pre>
 <p>The optimal station for 750 meters of elevation gain is: Osterhofen
 where you can ascend 750 m in 2.29 km.</p>
-<table>
-<colgroup>
-<col width="24%" />
-<col width="25%" />
-<col width="50%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th align="left">Station name</th>
-<th align="right">Station elevation (m)</th>
-<th align="right">Distance to closest point 750 m higher (m)</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Osterhofen (Oberbay)</td>
-<td align="right">805</td>
-<td align="right">2287.642</td>
-</tr>
-<tr class="even">
-<td align="left">Bayrischzell</td>
-<td align="right">806</td>
-<td align="right">2333.523</td>
-</tr>
-<tr class="odd">
-<td align="left">Fischbachau</td>
-<td align="right">756</td>
-<td align="right">2366.798</td>
-</tr>
-<tr class="even">
-<td align="left">Geitau</td>
-<td align="right">780</td>
-<td align="right">2738.108</td>
-</tr>
-<tr class="odd">
-<td align="left">Fischhausen-Neuhaus</td>
-<td align="right">803</td>
-<td align="right">3116.556</td>
-</tr>
-<tr class="even">
-<td align="left">Lenggries</td>
-<td align="right">680</td>
-<td align="right">3364.948</td>
-</tr>
-<tr class="odd">
-<td align="left">Obergries</td>
-<td align="right">667</td>
-<td align="right">5107.870</td>
-</tr>
-<tr class="even">
-<td align="left">Tegernsee</td>
-<td align="right">762</td>
-<td align="right">5895.583</td>
-</tr>
-<tr class="odd">
-<td align="left">Schliersee</td>
-<td align="right">785</td>
-<td align="right">6112.997</td>
-</tr>
-<tr class="even">
-<td align="left">Gaißach</td>
-<td align="right">667</td>
-<td align="right">7149.062</td>
-</tr>
-<tr class="odd">
-<td align="left">Hausham</td>
-<td align="right">760</td>
-<td align="right">7877.944</td>
-</tr>
-<tr class="even">
-<td align="left">Agatharied</td>
-<td align="right">729</td>
-<td align="right">9379.123</td>
-</tr>
-<tr class="odd">
-<td align="left">Gmund</td>
-<td align="right">739</td>
-<td align="right">9442.909</td>
-</tr>
-<tr class="even">
-<td align="left">Finsterwald</td>
-<td align="right">767</td>
-<td align="right">9533.407</td>
-</tr>
-<tr class="odd">
-<td align="left">Bad Tölz</td>
-<td align="right">688</td>
-<td align="right">9569.030</td>
-</tr>
-<tr class="even">
-<td align="left">Reichersbeuern</td>
-<td align="right">719</td>
-<td align="right">9989.030</td>
-</tr>
-<tr class="odd">
-<td align="left">Moosrain</td>
-<td align="right">759</td>
-<td align="right">10515.953</td>
-</tr>
-<tr class="even">
-<td align="left">Miesbach</td>
-<td align="right">687</td>
-<td align="right">11749.641</td>
-</tr>
-<tr class="odd">
-<td align="left">Schaftlach</td>
-<td align="right">760</td>
-<td align="right">12482.759</td>
-</tr>
-<tr class="even">
-<td align="left">Warngau</td>
-<td align="right">716</td>
-<td align="right">16990.758</td>
-</tr>
-<tr class="odd">
-<td align="left">Darching</td>
-<td align="right">663</td>
-<td align="right">18859.716</td>
-</tr>
-</tbody>
-</table>
+<div class="reactable html-widget html-fill-item" id="htmlwidget-28da6b9e74472330289c" style="width:auto;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-28da6b9e74472330289c">{"x":{"tag":{"name":"Reactable","attribs":{"data":{".rownames":["X1","X2","X3","X4","X5","X6","X7","X8","X9","X10","X11","X12","X13","X14","X15","X16","X17","X18","X19","X20","X21"],"name":["Schaftlach","Darching","Agatharied","Hausham","Fischhausen-Neuhaus","Geitau","Bayrischzell","Gaißach","Osterhofen (Oberbay)","Gmund","Moosrain","Obergries","Warngau","Miesbach","Tegernsee","Bad Tölz","Lenggries","Schliersee","Fischbachau","Reichersbeuern","Finsterwald"],"elevation":[760,663,729,760,803,780,806,667,805,739,759,667,716,687,762,688,680,785,756,719,767],"distance_750":[12482.7589629425,18859.7162457136,9379.12343323405,7877.94365303501,3116.55574191843,2738.10804287833,2333.52339159433,7149.06188775964,2287.64197421958,9442.90947642735,10515.9531418103,5107.86958582322,16990.757653526,11749.6413843889,5895.5829860291,9569.03019256544,3364.94786489486,6112.99690719322,2366.79793106058,9989.02955460826,9533.40693531257]},"columns":[{"id":".rownames","name":"","type":"character","sortable":false,"filterable":false,"rowHeader":true},{"id":"name","name":"Station name","type":"character","filterable":true,"align":"left"},{"id":"elevation","name":"Station elevation (m)","type":"numeric","format":{"cell":{"digits":0},"aggregated":{"digits":0}}},{"id":"distance_750","name":"Distance to closest point 750 m higher (m)","type":"numeric"}],"defaultSorted":[{"id":"distance_750","desc":false}],"defaultPageSize":10,"highlight":true,"bordered":true,"dataKey":"622394244a16bbedd1851faa1609d290"},"children":[]},"class":"reactR_markup"},"evals":[],"jsHooks":[]}</script>
 <p>Let’s look at the winner station on a map. The winning point to reach
 is highlighted in pink.</p>
 <p><img src="osterhofen.png" style="width:125.0%" /></p>
@@ -551,10 +432,11 @@ is highlighted in pink.</p>
 solution:</p>
 <ol style="list-style-type: decimal">
 <li>Expand on the arbitrary nature of a reference altitude by finding
-the best stations for an interval of altitude gains</li>
+the best stations for an interval of altitude gains (100 m to 1000
+m)</li>
 <li>Drop the assumption that I can simply reach any point as the crow
 flies. Rather, I want to find the closest peak I can reach via hiking
-trails.</li>
+trails (see map above).</li>
 </ol>
 <p>First, let’s look at the first extension:</p>
 <pre class="r"><code>reference_altitude=seq(100,1000,100)
@@ -608,307 +490,20 @@ data_dist &lt;- data_dist %&gt;% mutate(steepness=altitude_gain/distance)</code>
 stations:</p>
 <p>The highest steepness, i.e. altitude gain per distance, can be
 reached in Bayrischzell when gaining 700 m in elevation.</p>
-<table>
-<thead>
-<tr class="header">
-<th align="left">Station name</th>
-<th align="right">Altitude gain</th>
-<th align="right">Steepness</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Bayrischzell</td>
-<td align="right">700</td>
-<td align="right">0.4387454</td>
-</tr>
-<tr class="even">
-<td align="left">Bayrischzell</td>
-<td align="right">600</td>
-<td align="right">0.4178294</td>
-</tr>
-<tr class="odd">
-<td align="left">Osterhofen (Oberbay)</td>
-<td align="right">700</td>
-<td align="right">0.3850442</td>
-</tr>
-<tr class="even">
-<td align="left">Bayrischzell</td>
-<td align="right">500</td>
-<td align="right">0.3786961</td>
-</tr>
-<tr class="odd">
-<td align="left">Osterhofen (Oberbay)</td>
-<td align="right">600</td>
-<td align="right">0.3712598</td>
-</tr>
-<tr class="even">
-<td align="left">Osterhofen (Oberbay)</td>
-<td align="right">900</td>
-<td align="right">0.3652907</td>
-</tr>
-<tr class="odd">
-<td align="left">Osterhofen (Oberbay)</td>
-<td align="right">500</td>
-<td align="right">0.3585740</td>
-</tr>
-<tr class="even">
-<td align="left">Bayrischzell</td>
-<td align="right">400</td>
-<td align="right">0.3527236</td>
-</tr>
-<tr class="odd">
-<td align="left">Tegernsee</td>
-<td align="right">300</td>
-<td align="right">0.3486320</td>
-</tr>
-<tr class="even">
-<td align="left">Tegernsee</td>
-<td align="right">400</td>
-<td align="right">0.3452312</td>
-</tr>
-</tbody>
-</table>
+<div class="reactable html-widget html-fill-item" id="htmlwidget-d43f8034d369ede9b857" style="width:auto;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-d43f8034d369ede9b857">{"x":{"tag":{"name":"Reactable","attribs":{"data":{"name":["Schaftlach","Darching","Agatharied","Hausham","Fischhausen-Neuhaus","Geitau","Bayrischzell","Gaißach","Osterhofen (Oberbay)","Gmund","Moosrain","Obergries","Warngau","Miesbach","Tegernsee","Bad Tölz","Lenggries","Schliersee","Fischbachau","Reichersbeuern","Finsterwald","Schaftlach","Darching","Agatharied","Hausham","Fischhausen-Neuhaus","Geitau","Bayrischzell","Gaißach","Osterhofen (Oberbay)","Gmund","Moosrain","Obergries","Warngau","Miesbach","Tegernsee","Bad Tölz","Lenggries","Schliersee","Fischbachau","Reichersbeuern","Finsterwald","Schaftlach","Darching","Agatharied","Hausham","Fischhausen-Neuhaus","Geitau","Bayrischzell","Gaißach","Osterhofen (Oberbay)","Gmund","Moosrain","Obergries","Warngau","Miesbach","Tegernsee","Bad Tölz","Lenggries","Schliersee","Fischbachau","Reichersbeuern","Finsterwald","Schaftlach","Darching","Agatharied","Hausham","Fischhausen-Neuhaus","Geitau","Bayrischzell","Gaißach","Osterhofen (Oberbay)","Gmund","Moosrain","Obergries","Warngau","Miesbach","Tegernsee","Bad Tölz","Lenggries","Schliersee","Fischbachau","Reichersbeuern","Finsterwald","Schaftlach","Darching","Agatharied","Hausham","Fischhausen-Neuhaus","Geitau","Bayrischzell","Gaißach","Osterhofen (Oberbay)","Gmund","Moosrain","Obergries","Warngau","Miesbach","Tegernsee","Bad Tölz","Lenggries","Schliersee","Fischbachau","Reichersbeuern","Finsterwald","Schaftlach","Darching","Agatharied","Hausham","Fischhausen-Neuhaus","Geitau","Bayrischzell","Gaißach","Osterhofen (Oberbay)","Gmund","Moosrain","Obergries","Warngau","Miesbach","Tegernsee","Bad Tölz","Lenggries","Schliersee","Fischbachau","Reichersbeuern","Finsterwald","Schaftlach","Darching","Agatharied","Hausham","Fischhausen-Neuhaus","Geitau","Bayrischzell","Gaißach","Osterhofen (Oberbay)","Gmund","Moosrain","Obergries","Warngau","Miesbach","Tegernsee","Bad Tölz","Lenggries","Schliersee","Fischbachau","Reichersbeuern","Finsterwald","Schaftlach","Darching","Agatharied","Hausham","Fischhausen-Neuhaus","Geitau","Bayrischzell","Gaißach","Osterhofen (Oberbay)","Gmund","Moosrain","Obergries","Warngau","Miesbach","Tegernsee","Bad Tölz","Lenggries","Schliersee","Fischbachau","Reichersbeuern","Finsterwald","Schaftlach","Darching","Agatharied","Hausham","Fischhausen-Neuhaus","Geitau","Bayrischzell","Gaißach","Osterhofen (Oberbay)","Gmund","Moosrain","Obergries","Warngau","Miesbach","Tegernsee","Bad Tölz","Lenggries","Schliersee","Fischbachau","Reichersbeuern","Finsterwald","Schaftlach","Darching","Agatharied","Hausham","Fischhausen-Neuhaus","Geitau","Bayrischzell","Gaißach","Osterhofen (Oberbay)","Gmund","Moosrain","Obergries","Warngau","Miesbach","Tegernsee","Bad Tölz","Lenggries","Schliersee","Fischbachau","Reichersbeuern","Finsterwald"],"altitude_gain":[100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,300,300,300,300,300,300,300,300,300,300,300,300,300,300,300,300,300,300,300,300,300,400,400,400,400,400,400,400,400,400,400,400,400,400,400,400,400,400,400,400,400,400,500,500,500,500,500,500,500,500,500,500,500,500,500,500,500,500,500,500,500,500,500,600,600,600,600,600,600,600,600,600,600,600,600,600,600,600,600,600,600,600,600,600,700,700,700,700,700,700,700,700,700,700,700,700,700,700,700,700,700,700,700,700,700,800,800,800,800,800,800,800,800,800,800,800,800,800,800,800,800,800,800,800,800,800,900,900,900,900,900,900,900,900,900,900,900,900,900,900,900,900,900,900,900,900,900,1000,1000,1000,1000,1000,1000,1000,1000,1000,1000,1000,1000,1000,1000,1000,1000,1000,1000,1000,1000,1000],"steepness":[0.0207361391609253,0.0405663174578331,0.120965092375123,0.169923814969456,0.148226679724768,0.17526743027545,0.232604766771164,0.0621514253822613,0.22146335273363,0.082533594407102,0.0442535336762655,0.0481081576811854,0.0473602476025592,0.0671694954804885,0.263902121877593,0.0299283046277343,0.0703553385259337,0.153014956508134,0.152720279137294,0.0379578345432531,0.0400137518914037,0.033347239156505,0.0419982670026911,0.0677679167813404,0.150909185306537,0.238962683666509,0.185566949734051,0.224589344731019,0.107259216235704,0.267387403270622,0.0913309982328306,0.0554700124505804,0.0832947329192267,0.0198761178469982,0.0798639982176327,0.332754766605919,0.056298890902558,0.106513127119179,0.2102250152814,0.213494019434404,0.0526984236989557,0.0719889244876481,0.0469211117364996,0.0204447692110556,0.095671672831652,0.172182322178937,0.306674730882275,0.210558599247099,0.295068805975026,0.143273087183161,0.306589774710163,0.120252734448182,0.0747504027176972,0.10761017074986,0.0283094489591286,0.0522133176054536,0.348631981474043,0.0784001019266176,0.142887937218223,0.22741733613878,0.26821560717322,0.0734360303610392,0.0941610374855645,0.0582698371459381,0.0267345942031156,0.114201755312014,0.176137047992404,0.333132920254109,0.248901601705628,0.352723636878037,0.173986897853932,0.334562287711578,0.139464571272596,0.0876610614089976,0.130377583525361,0.0360743947628517,0.0651705726992476,0.34523124959125,0.0958334644128604,0.161866644965844,0.211516245337249,0.279073844015934,0.0912585407421101,0.108795029075659,0.06752618000184,0.0329080778853974,0.128845177859252,0.146614899431999,0.301950929490822,0.26689560755145,0.378696149828374,0.167266283614682,0.358574031965744,0.141632425956216,0.0953289102743933,0.125478187627826,0.0428985016140687,0.07626576691746,0.240996990198639,0.110242763260538,0.186726969210764,0.136300965822534,0.309662968578052,0.101368623428112,0.0955937025479055,0.0665700687034319,0.037824608018411,0.088174469637818,0.105523778191068,0.288760023161999,0.267926539682174,0.417829425345267,0.175133478844235,0.371259830689453,0.0947940831804675,0.0840377420247913,0.134786574507799,0.0465228536410699,0.0773491791119876,0.152692749665318,0.108540396512375,0.207686843288656,0.126789584313308,0.293740054921156,0.102250939960697,0.0940514708662809,0.0564176740917065,0.0372754041802536,0.098166044794691,0.0948891009042577,0.268253931436666,0.279140393431154,0.438745422369524,0.0991118806563862,0.385044183097166,0.0745027882705374,0.067042458720942,0.139223806066722,0.0427760969492596,0.0708364990895654,0.12038859885524,0.0738616886232643,0.215825965464363,0.12476434797562,0.309907375420189,0.0705822867376197,0.0739880468368508,0.0556355623781772,0.0371568982293891,0.0813001407819321,0.0951556376019801,0.247925420642201,0.245036482710264,0.321957876445308,0.09925294720888,0.339529934176631,0.080396071826578,0.0678828891261383,0.146691151722812,0.0468752125895852,0.0667121908449055,0.134160511763436,0.078331001374908,0.202459718744273,0.123213898527251,0.327472986859297,0.0794722451988839,0.0770872775816631,0.0542460305233664,0.0404610022305425,0.0857628206666701,0.0925487294388069,0.207157614076472,0.260790909335881,0.305173432610057,0.0860903843809199,0.365290670995031,0.0875029328198962,0.0715748080392539,0.105628938936719,0.0469373650763043,0.069539199133985,0.148111216218643,0.0627641908016264,0.133331604067077,0.117711596300991,0.249559536039044,0.0669768145338275,0.0819246872589976,0.0509844925145847,0.0440129208494783,0.0699267789201941,0.0799256210137405,0.139311795319444,0.281323813121694,0.26805691395556,0.0546824317569794,0.22904579583944,0.0748131264598832,0.0639379957494719,0.0567785188352755,0.043939618024462,0.0713051796988644,0.108996821479613,0.050741007166945,0.0597843256625127,0.0966225856449578,0.192487242411369,0.0510802622680459,0.0711204675117083]},"columns":[{"id":"name","name":"Station name","type":"character","filterable":true,"align":"left"},{"id":"altitude_gain","name":"Altitude gain (m)","type":"numeric","filterable":true,"format":{"cell":{"digits":0},"aggregated":{"digits":0}}},{"id":"steepness","name":"Steepness","type":"numeric","format":{"cell":{"digits":2,"percent":true},"aggregated":{"digits":2,"percent":true}}}],"defaultSorted":[{"id":"steepness","desc":true}],"defaultPageSize":10,"highlight":true,"bordered":true,"dataKey":"2d4681d45c6450d7bf14f72aa425d2cb"},"children":[]},"class":"reactR_markup"},"evals":[],"jsHooks":[]}</script>
 <p>However, as the following plot shows, Bayrischzell is not the most
 efficient station at all altitude gains. Up to 400 meters, it takes less
-distance starting at the station Tegernsee:
-<img src="about_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+distance starting at the station Tegernsee:</p>
+<p><img src="about_files/figure-html/unnamed-chunk-11-1.png" width="2450" /></p>
 <p>The highest average steepness still belongs to Bayrischzell though as
 this table shows:</p>
-<table>
-<thead>
-<tr class="header">
-<th align="left">Station name</th>
-<th align="right">Average steepness</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Bayrischzell</td>
-<td align="right">0.3235446</td>
-</tr>
-<tr class="even">
-<td align="left">Osterhofen (Oberbay)</td>
-<td align="right">0.3178747</td>
-</tr>
-<tr class="odd">
-<td align="left">Fischbachau</td>
-<td align="right">0.2596334</td>
-</tr>
-<tr class="even">
-<td align="left">Fischhausen-Neuhaus</td>
-<td align="right">0.2480357</td>
-</tr>
-<tr class="odd">
-<td align="left">Geitau</td>
-<td align="right">0.2421408</td>
-</tr>
-<tr class="even">
-<td align="left">Tegernsee</td>
-<td align="right">0.2195867</td>
-</tr>
-<tr class="odd">
-<td align="left">Schliersee</td>
-<td align="right">0.1527577</td>
-</tr>
-<tr class="even">
-<td align="left">Lenggries</td>
-<td align="right">0.1487438</td>
-</tr>
-<tr class="odd">
-<td align="left">Hausham</td>
-<td align="right">0.1283810</td>
-</tr>
-<tr class="even">
-<td align="left">Gaißach</td>
-<td align="right">0.1168208</td>
-</tr>
-<tr class="odd">
-<td align="left">Obergries</td>
-<td align="right">0.1077978</td>
-</tr>
-<tr class="even">
-<td align="left">Gmund</td>
-<td align="right">0.0987223</td>
-</tr>
-<tr class="odd">
-<td align="left">Agatharied</td>
-<td align="right">0.0950782</td>
-</tr>
-<tr class="even">
-<td align="left">Finsterwald</td>
-<td align="right">0.0808724</td>
-</tr>
-<tr class="odd">
-<td align="left">Bad Tölz</td>
-<td align="right">0.0744942</td>
-</tr>
-<tr class="even">
-<td align="left">Reichersbeuern</td>
-<td align="right">0.0727082</td>
-</tr>
-<tr class="odd">
-<td align="left">Moosrain</td>
-<td align="right">0.0711940</td>
-</tr>
-<tr class="even">
-<td align="left">Miesbach</td>
-<td align="right">0.0696425</td>
-</tr>
-<tr class="odd">
-<td align="left">Schaftlach</td>
-<td align="right">0.0510654</td>
-</tr>
-<tr class="even">
-<td align="left">Warngau</td>
-<td align="right">0.0401570</td>
-</tr>
-<tr class="odd">
-<td align="left">Darching</td>
-<td align="right">0.0359383</td>
-</tr>
-</tbody>
-</table>
-<pre class="r"><code>brb_stations %&gt;% dplyr::select(name,min_dist_peak_name,min_dist_peak,min_dist_peak_elevation_difference) %&gt;% st_drop_geometry() %&gt;% arrange(min_dist_peak) %&gt;% knitr::kable(row.names = F,col.names = c(&quot;Station name&quot;,&quot;Peak name&quot;,&quot;Distance&quot;,&quot;Elevation distance&quot;))</code></pre>
-<table>
-<thead>
-<tr class="header">
-<th align="left">Station name</th>
-<th align="left">Peak name</th>
-<th align="right">Distance</th>
-<th align="right">Elevation distance</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Bayrischzell</td>
-<td align="left">Wendelstein</td>
-<td align="right">5756.869</td>
-<td align="right">1032</td>
-</tr>
-<tr class="even">
-<td align="left">Osterhofen (Oberbay)</td>
-<td align="left">Wendelstein</td>
-<td align="right">6057.653</td>
-<td align="right">1033</td>
-</tr>
-<tr class="odd">
-<td align="left">Fischbachau</td>
-<td align="left">Aiplspitz</td>
-<td align="right">6661.403</td>
-<td align="right">1003</td>
-</tr>
-<tr class="even">
-<td align="left">Geitau</td>
-<td align="left">Wendelstein</td>
-<td align="right">6837.118</td>
-<td align="right">1058</td>
-</tr>
-<tr class="odd">
-<td align="left">Fischhausen-Neuhaus</td>
-<td align="left">Lempersberg</td>
-<td align="right">9348.468</td>
-<td align="right">1014</td>
-</tr>
-<tr class="even">
-<td align="left">Lenggries</td>
-<td align="left">Roßstein</td>
-<td align="right">11744.779</td>
-<td align="right">1018</td>
-</tr>
-<tr class="odd">
-<td align="left">Schliersee</td>
-<td align="left">Lempersberg</td>
-<td align="right">13426.962</td>
-<td align="right">1032</td>
-</tr>
-<tr class="even">
-<td align="left">Tegernsee</td>
-<td align="left">Blankenstein</td>
-<td align="right">13616.252</td>
-<td align="right">1006</td>
-</tr>
-<tr class="odd">
-<td align="left">Obergries</td>
-<td align="left">Roßstein</td>
-<td align="right">14945.497</td>
-<td align="right">1031</td>
-</tr>
-<tr class="even">
-<td align="left">Agatharied</td>
-<td align="left">Jägerkamp</td>
-<td align="right">15303.359</td>
-<td align="right">1017</td>
-</tr>
-<tr class="odd">
-<td align="left">Hausham</td>
-<td align="left">Lempersberg</td>
-<td align="right">15810.777</td>
-<td align="right">1057</td>
-</tr>
-<tr class="even">
-<td align="left">Miesbach</td>
-<td align="left">Jägerkamp</td>
-<td align="right">18279.452</td>
-<td align="right">1059</td>
-</tr>
-<tr class="odd">
-<td align="left">Gaißach</td>
-<td align="left">Roßstein</td>
-<td align="right">18782.963</td>
-<td align="right">1031</td>
-</tr>
-<tr class="even">
-<td align="left">Gmund</td>
-<td align="left">Blankenstein</td>
-<td align="right">18877.650</td>
-<td align="right">1029</td>
-</tr>
-<tr class="odd">
-<td align="left">Finsterwald</td>
-<td align="left">Blankenstein</td>
-<td align="right">19573.087</td>
-<td align="right">1001</td>
-</tr>
-<tr class="even">
-<td align="left">Moosrain</td>
-<td align="left">Blankenstein</td>
-<td align="right">21393.072</td>
-<td align="right">1009</td>
-</tr>
-<tr class="odd">
-<td align="left">Bad Tölz</td>
-<td align="left">Roßstein</td>
-<td align="right">21567.387</td>
-<td align="right">1010</td>
-</tr>
-<tr class="even">
-<td align="left">Reichersbeuern</td>
-<td align="left">Wallberg</td>
-<td align="right">24053.739</td>
-<td align="right">1003</td>
-</tr>
-<tr class="odd">
-<td align="left">Warngau</td>
-<td align="left">Wallberg</td>
-<td align="right">25941.121</td>
-<td align="right">1006</td>
-</tr>
-<tr class="even">
-<td align="left">Schaftlach</td>
-<td align="left">Blankenstein</td>
-<td align="right">26513.270</td>
-<td align="right">1008</td>
-</tr>
-<tr class="odd">
-<td align="left">Darching</td>
-<td align="left">Brecherspitz</td>
-<td align="right">27503.781</td>
-<td align="right">1022</td>
-</tr>
-</tbody>
-</table>
-<p>```</p>
+<div class="reactable html-widget html-fill-item" id="htmlwidget-7434d565314f1dfd5c81" style="width:auto;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-7434d565314f1dfd5c81">{"x":{"tag":{"name":"Reactable","attribs":{"data":{"name":["Agatharied","Bad Tölz","Bayrischzell","Darching","Finsterwald","Fischbachau","Fischhausen-Neuhaus","Gaißach","Geitau","Gmund","Hausham","Lenggries","Miesbach","Moosrain","Obergries","Osterhofen (Oberbay)","Reichersbeuern","Schaftlach","Schliersee","Tegernsee","Warngau"],"mean":[0.0950781869960686,0.0744941809609427,0.323544577490934,0.0359382859268167,0.0808724395543682,0.259633391398996,0.248035672865526,0.116820803311714,0.242140832679485,0.0987223326874288,0.128381013702919,0.148743847426683,0.069642539879959,0.0711939814188532,0.107797782257279,0.317874726518946,0.0727082001472544,0.0510654335412975,0.152757653185023,0.219586700772969,0.0401569857066287]},"columns":[{"id":"name","name":"Station name","type":"character","filterable":true,"align":"left"},{"id":"mean","name":"Mean steepness","type":"numeric","format":{"cell":{"digits":2,"percent":true},"aggregated":{"digits":2,"percent":true}}}],"defaultSorted":[{"id":"mean","desc":true}],"defaultPageSize":10,"highlight":true,"bordered":true,"dataKey":"ed2e554b3acddf9dac3c1cff4a9c5d9b"},"children":[]},"class":"reactR_markup"},"evals":[],"jsHooks":[]}</script>
+<p>As for the second extension, this table shows which peaks can be
+reached along the trail network:</p>
+<div class="reactable html-widget html-fill-item" id="htmlwidget-477d4da3d9a7f4a447b7" style="width:auto;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-477d4da3d9a7f4a447b7">{"x":{"tag":{"name":"Reactable","attribs":{"data":{"name":["Schaftlach","Darching","Agatharied","Hausham","Fischhausen-Neuhaus","Geitau","Bayrischzell","Gaißach","Osterhofen (Oberbay)","Gmund","Moosrain","Obergries","Warngau","Miesbach","Tegernsee","Bad Tölz","Lenggries","Schliersee","Fischbachau","Reichersbeuern","Finsterwald"],"min_dist_peak_name":["Blankenstein","Brecherspitz","Jägerkamp","Lempersberg","Lempersberg","Wendelstein","Wendelstein","Roßstein","Wendelstein","Blankenstein","Blankenstein","Roßstein","Wallberg","Jägerkamp","Blankenstein","Roßstein","Roßstein","Lempersberg","Aiplspitz","Wallberg","Blankenstein"],"min_dist_peak":[26513.3687954373,27503.7810364571,15303.3587272613,15810.7771644004,9348.46807034674,6837.11842102115,5756.86878006226,18782.9632844037,6057.65254340995,18877.6500356061,21393.1712271553,14945.4971589366,25941.2200041692,18279.4522887299,13616.251576673,21567.4493122559,11744.778740119,13426.9615370751,6661.40277144771,24053.738912012,19573.0865001995],"min_dist_peak_elevation_difference":[1008,1022,1017,1057,1014,1058,1032,1031,1033,1029,1009,1031,1006,1059,1006,1010,1018,1032,1003,1003,1001]},"columns":[{"id":"name","name":"Station Name","type":"character","filterable":true,"align":"left"},{"id":"min_dist_peak_name","name":"Peak name","type":"character","filterable":true},{"id":"min_dist_peak","name":"Distance to peak (m)","type":"numeric","format":{"cell":{"digits":0},"aggregated":{"digits":0}}},{"id":"min_dist_peak_elevation_difference","name":"Altitude gain to peak (m)","type":"numeric","format":{"cell":{"digits":0},"aggregated":{"digits":0}}}],"defaultSorted":[{"id":"min_dist_peak","desc":false}],"defaultPageSize":10,"highlight":true,"bordered":true,"dataKey":"b3c7d68c1b8ee25f1dc35cff13bbc5e9"},"children":[]},"class":"reactR_markup"},"evals":[],"jsHooks":[]}</script>
 </div>
 </div>
 

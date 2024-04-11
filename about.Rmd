@@ -15,7 +15,7 @@ title: "Projects"
 knitr::opts_chunk$set(message = FALSE,warning = FALSE)
 rm(list=ls())
 library(pacman)
-p_load(tidyverse,elevatr,sf,rayshader,raster,terra,osmdata,parallel,dodgr)
+p_load(tidyverse,elevatr,sf,rayshader,raster,terra,osmdata,parallel,dodgr,reactable)
 
 # https://www.tylermw.com/posts/data_visualization/adding-open-street-map-data-to-rayshader-maps-in-r.html
 # https://norbertrenner.de/osm/bbox.html
@@ -48,7 +48,7 @@ brb_stations <- brb_stations %>% filter(!grepl(pattern="Gleis",name))
 
 The area of interest looks as follows:
 
-```{r echo=F}
+```{r echo=F, dpi=350,fig.fullwidth=TRUE}
 # Now the railways for the plots
 brb_rails <- brb_netz$osm_lines
 # Cannot simply duplicate as with the points since the lines have multiple coordinates per line --> select one point by line
@@ -59,6 +59,7 @@ ggplot(brb_rails)+geom_sf(lty="dashed")+geom_sf(data = brb_stations)+geom_sf_tex
 ```
 
 Next, I want to load additional data on lakes and peaks from OSM for further plots and calculations:
+
 ```{r}
 # Lakes come in both polygon and multipolygons in the osm data (depends on whether the lake is just one surface or has a smaller additional parrt)
 lakes <- opq(bbox =brb_bbox) %>% add_osm_feature(key="water",value="lake") %>% osmdata_sf()
@@ -76,6 +77,7 @@ peaks_points <- peaks_points %>% cbind(st_coordinates(peaks_points))
 ```
 
 Next, I want to load elevation data for the bounding box which I am looking at using the package [elevatr](https://github.com/jhollist/elevatr).
+
 ```{r}
 brb_elevation <- get_elev_raster(locations = brb_stations , z=11)
 # Saving the coordinate reference system for potential later use
@@ -87,6 +89,7 @@ brb_elevation_mat <- raster_to_matrix(brb_elevation_zoom)
 ```
 
 Next, I want to give a more intuitive visual representation of the area of interest including the elevation profile. To do this, I use the package [rayshader](https://www.rayshader.com).
+
 ```{r ,dpi=350,fig.fullwidth=TRUE,echo=F}
   lake_layer = generate_polygon_overlay(lakes_poly, extent = extent(brb_elevation_zoom),
                                                          heightmap = brb_elevation_mat, palette="#85b6ce",linecolor = "transparent") %>%
@@ -175,7 +178,19 @@ brb_stations <- cbind(brb_stations,out)
 
 The optimal station for 750 meters of elevation gain is: Osterhofen where you can ascend 750 m in 2.29 km. 
 ```{r echo=F, results='asis'}
-brb_stations %>%dplyr::select(name,elevation,distance_750) %>% st_drop_geometry()%>% arrange(distance_750) %>% knitr::kable(row.names = F,col.names = c("Station name","Station elevation (m)","Distance to closest point 750 m higher (m)")) 
+# brb_stations %>%dplyr::select(name,elevation,distance_750) %>% st_drop_geometry()%>% arrange(distance_750) %>% knitr::kable(row.names = F,col.names = c("Station name","Station elevation (m)","Distance to closest point 750 m higher (m)")) 
+
+
+brb_stations %>% dplyr::select(name,elevation,distance_750) %>% st_drop_geometry() %>% reactable::reactable(
+  bordered = T,
+  highlight = T,
+  defaultPageSize = 10,
+  defaultSorted = list(distance_750="asc"),
+  columns = list(
+    name = colDef(name = "Station name", align = "left",filterable = T),
+    elevation = colDef(name = "Station elevation (m)", format =colFormat(digits = 0)),
+    distance_750 = colDef(name = "Distance to closest point 750 m higher (m)")
+  ))
 ```
 Let's look at the winner station on a map. The winning point to reach is highlighted in pink.
 
@@ -231,8 +246,8 @@ plot_winner <-  brb_elevation_winner_mat %>%
 
 I would now like to add two extensions to this simplistic solution: 
 
-1. Expand on the arbitrary nature of a reference altitude by finding the best stations for an interval of altitude gains
-2. Drop the assumption that I can simply reach any point as the crow flies. Rather, I want to find the closest peak I can reach via hiking trails.
+1. Expand on the arbitrary nature of a reference altitude by finding the best stations for an interval of altitude gains (100 m to 1000 m)
+2. Drop the assumption that I can simply reach any point as the crow flies. Rather, I want to find the closest peak I can reach via hiking trails (see map above).
 
 First, let's look at the first extension: 
 
@@ -291,11 +306,23 @@ We can now look at the steepness in the area surrounding the stations:
 The highest steepness, i.e. altitude gain per distance, can be reached in Bayrischzell when gaining 700 m in elevation.
 
 ```{r echo=F,results='asis'}
-data_dist %>% dplyr::select(name,altitude_gain,steepness) %>%arrange( desc(steepness) )%>% head(10) %>% knitr::kable(row.names = F,col.names = c("Station name","Altitude gain","Steepness"))
+# data_dist %>% dplyr::select(name,altitude_gain,steepness) %>%arrange( desc(steepness) )%>% head(10) %>% knitr::kable(row.names = F,col.names = c("Station name","Altitude gain","Steepness"))
+
+data_dist %>% dplyr::select(name,altitude_gain,steepness) %>% reactable::reactable(
+  bordered = T,
+  highlight = T,
+  defaultPageSize = 10,
+  defaultSorted = list(steepness="desc"),
+  columns = list(
+    name = colDef(name = "Station name", align = "left",filterable = T),
+    altitude_gain = colDef(name = "Altitude gain (m)",filterable = T, format =colFormat(digits = 0)),
+    steepness = colDef(name = "Steepness",format=colFormat(percent = T,digits = 2))
+  ))
 ```
 
 However, as the following plot shows, Bayrischzell is not the most efficient station at all altitude gains. Up to 400 meters, it takes less distance starting at the station Tegernsee:
-```{r echo=F, fig.fullwidth=TRUE}
+
+```{r echo=F,dpi=350, fig.fullwidth=TRUE}
 
 # Still have to think about switching x and y axis
 data_dist %>% filter(name=="Tegernsee"|name=="Bayrischzell") %>% ggplot(aes(x=altitude_gain,y=distance,color=name))+geom_line()+ theme_bw()+scale_y_continuous(trans='log10')+scale_x_continuous(breaks=seq(100,1000,100))+xlab("Elevation Gain")+ylab("Distance")+ggtitle("Steepness at given elevation gain")
@@ -303,11 +330,25 @@ data_dist %>% filter(name=="Tegernsee"|name=="Bayrischzell") %>% ggplot(aes(x=al
 
 The highest average steepness still belongs to Bayrischzell though as this table shows:
 ```{r echo=F,results='asis'}
- data_dist %>%
-  group_by(name) %>%
-  summarise(mean = mean(steepness)) %>% arrange(desc(mean) ) %>% knitr::kable(row.names = F,col.names = c("Station name","Average steepness"))
-```
+ # data_dist %>%
+ #  group_by(name) %>%
+ #  summarise(mean = mean(steepness)) %>% arrange(desc(mean) ) %>% knitr::kable(row.names = F,col.names = c("Station name","Average steepness"))
 
+
+data_dist %>%  group_by(name) %>%
+  summarise(mean = mean(steepness))%>%
+  reactable::reactable(
+  bordered = T,
+  highlight = T,
+  defaultPageSize = 10,
+  defaultSorted = list(mean="desc"),
+  columns = list(
+    name = colDef(name = "Station name", align = "left",filterable = T),
+    mean = colDef(name = "Mean steepness",format=colFormat(percent = T,digits = 2))
+  ))
+
+```
+As for the second extension, this table shows which peaks can be reached along the trail network:
 ```{r echo=F }
 #####
 # Now: find the peak at least 500m above each station which I can reach the fastes by hiking on actual trails:
@@ -398,9 +439,28 @@ brb_stations <- brb_stations %>% mutate(min_dist_peak_elevation_difference=min_d
 ```
 
 
-```{r results='asis' }
-brb_stations %>% dplyr::select(name,min_dist_peak_name,min_dist_peak,min_dist_peak_elevation_difference) %>% st_drop_geometry() %>% arrange(min_dist_peak) %>% knitr::kable(row.names = F,col.names = c("Station name","Peak name","Distance","Elevation distance"))
+```{r echo=F, results='asis' }
+# brb_stations %>% dplyr::select(name,min_dist_peak_name,min_dist_peak,min_dist_peak_elevation_difference) %>% st_drop_geometry() %>% arrange(min_dist_peak) %>% knitr::kable(row.names = F,col.names = c("Station name","Peak name","Distance","Elevation distance"))
+
+
+
+
+brb_stations %>%
+  dplyr::select(name,min_dist_peak_name,min_dist_peak,min_dist_peak_elevation_difference) %>% 
+  st_drop_geometry() %>%
+  reactable::reactable(
+  bordered = T,
+  highlight = T,
+  rownames = F,
+  defaultSorted = list(min_dist_peak="asc"),
+  defaultPageSize = 10,
+  columns = list(
+    name = colDef(name = "Station Name", align = "left",filterable = T),
+    min_dist_peak_name=colDef(name = "Peak name",filterable = T),
+    min_dist_peak = colDef(name = "Distance to peak (m)", format =colFormat(digits = 0)),
+    min_dist_peak_elevation_difference = colDef(name = "Altitude gain to peak (m)", format =colFormat(digits = 0))
+  ))
 ```
-```
+
 
 

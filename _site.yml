@@ -1,7 +1,7 @@
 name: "EmilPhilipp"                                # CHANGE HERE 
 output_dir: "."
 navbar:
-  title: "EmilPhilipp"                             # CHANGE HERE 
+  title: "Emil Philipp"                             # CHANGE HERE 
   type: inverse
   left:
     - text: "Home"
@@ -10,9 +10,6 @@ navbar:
     - text: "Projects"
       icon: fa-user 
       href: about.html
-    - text: "CV"
-      icon: fa-file-pdf-o
-      href: cv.html
   right:
     - text: "Contact me"
       icon: fa-envelope-o
