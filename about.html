@@ -268,24 +268,17 @@ $(document).ready(function () {
     CV
   </a>
 </li>
-<li>
-  <a href="https://YOURGITHUB.github.io/blog/">
-    <span class="fa fa-rss"></span>
-     
-    Blog
-  </a>
-</li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="mailto:YOUREMAIL">
+  <a href="mailto:emil.johan.philipp@gmail.com">
     <span class="fa fa-envelope-o"></span>
      
     Contact me
   </a>
 </li>
 <li>
-  <a href="https://github.com/YOURGITHUB">
+  <a href="https://github.com/emilphilipp">
     <span class="fa fa-github"></span>
      
     GitHub
@@ -307,7 +300,7 @@ $(document).ready(function () {
 
 <style type="text/css">
 .main-container {
-  max-width: 1920px;
+  max-width: 1800px;
   margin-left: auto;
   margin-right: auto;
 }
@@ -370,32 +363,8 @@ brb_elevation_zoom &lt;- crop(brb_elevation,extent(brb_bbox))
 brb_elevation_mat &lt;- raster_to_matrix(brb_elevation_zoom)</code></pre>
 <p>Next, I want to give a more intuitive visual representation of the
 area of interest including the elevation profile. To do this, I use the
-package <a href="https://www.rayshader.com">rayshader</a>.</p>
-<pre class="r"><code>  lake_layer = generate_polygon_overlay(lakes_poly, extent = extent(brb_elevation_zoom),
-                                                         heightmap = brb_elevation_mat, palette=&quot;#85b6ce&quot;,linecolor = &quot;transparent&quot;) %&gt;%
-              add_overlay( generate_polygon_overlay(lakes_multi, extent = extent(brb_elevation_zoom),
-                                                    heightmap = brb_elevation_mat, palette=&quot;#85b6ce&quot;,linecolor = &quot;transparent&quot;) ) 
-   
- plot_brb &lt;-  brb_elevation_mat %&gt;% 
-    height_shade(texture = grDevices::colorRampPalette(c(&quot;#acc484&quot;,&quot;#f0eeed&quot;))(4)) %&gt;%
-    add_shadow(lamb_shade(brb_elevation_mat),0.25) %&gt;% 
-    add_overlay(generate_contour_overlay(brb_elevation_mat, color = &quot;#7d4911&quot;, 
-                                         linewidth = 2, levels=seq(min(brb_elevation_mat), max(brb_elevation_mat), by=100)),alphalayer = 0.5) %&gt;% 
-    add_overlay(lake_layer) %&gt;% 
-    add_overlay(height_shade(brb_elevation_mat,texture = &quot;white&quot;), alphalayer=0.2) %&gt;% 
-    add_overlay(generate_line_overlay(brb_rails,extent = extent(brb_elevation_zoom),
-                                      linewidth = 4, color=&quot;brown&quot;,lty=4, 
-                                      heightmap = brb_elevation_mat)) %&gt;% 
-    add_overlay(generate_label_overlay(brb_stations, extent = extent(brb_elevation_zoom),
-                                       text_size = 1, point_size = 1, color = &quot;black&quot;, 
-                                       halo_color = &quot;#e6e1db&quot;, halo_expand = 5, 
-                                       halo_blur = 2, halo_alpha = 0.8,
-                                       seed=1, heightmap = brb_elevation_mat, 
-                                       data_label_column =&quot;name&quot;)) %&gt;% add_overlay( generate_point_overlay(peaks_points, extent = extent(brb_elevation_zoom),
-                                                                                                           heightmap = brb_elevation_mat,pch=17,size = 0.75,color=&quot;#312647&quot;) )
-
-plot_brb %&gt;% plot_map() </code></pre>
-<p><img src="about_files/figure-html/unnamed-chunk-5-1.png" width="2450" />
+package <a href="https://www.rayshader.com">rayshader</a>.
+<img src="about_files/figure-html/unnamed-chunk-5-1.png" width="2450" />
 <!-- ![](brb_plot.png){width="125%"} --></p>
 <div id="calculating-the-optimal-station" class="section level3">
 <h3>Calculating the optimal station</h3>
@@ -575,53 +544,8 @@ where you can ascend 750 m in 2.29 km.</p>
 </tr>
 </tbody>
 </table>
-<p>Let’s look at the winner station on a map:</p>
-<pre class="r"><code># plot winner station
-# Probably want to add hiking trails to a subset of the map of the winner stations
-winner_point &lt;- brb_stations %&gt;% filter(distance_750==min(distance_750))%&gt;% dplyr::select(lon_750,lat_750) %&gt;% st_drop_geometry()
-winner_point &lt;- st_as_sf(winner_point, coords = c(&quot;lon_750&quot;,&quot;lat_750&quot;))
-
-# Add walking paths for the plot and for later calculations
-brb_paths &lt;- opq(bbox =brb_bbox) %&gt;% add_osm_features(features=list(&quot;highway&quot;=&quot;footway&quot;,
-                                                                    &quot;highway&quot;=&quot;path&quot;,&quot;highway&quot;=&quot;track&quot;)) %&gt;% osmdata_sf()
-
-
-# Found again manually as above
-winner_bbox =           c(11.9555,47.661,12.0565,47.7115)
-# Have to do some manual adjustments to make the map look nice
-locations &lt;- data.frame(peaks_points%&gt;% filter(name==&quot;Breitenstein&quot;|name==&quot;Jackelberg&quot;)  %&gt;% dplyr::select(X,Y) %&gt;% st_drop_geometry())
-locations &lt;- locations %&gt;% rbind(data.frame(brb_stations%&gt;% filter(name%in%c(&quot;Bayrischzell&quot;,&quot;Osterhofen (Oberbay)&quot;,&quot;Geitau&quot;))  %&gt;% dplyr::select(X,Y) %&gt;% st_drop_geometry()))
-colnames(locations) &lt;- c(&quot;x&quot;,&quot;y&quot;)
-brb_elevation_winner &lt;- get_elev_raster(locations = locations ,prj = crs_elevation, z=14)
-brb_elevation_winner_zoom &lt;- crop(brb_elevation_winner,extent(winner_bbox))
-brb_elevation_winner_mat &lt;- raster_to_matrix(brb_elevation_winner_zoom)
-
-plot_winner &lt;-  brb_elevation_winner_mat %&gt;% 
-  height_shade(texture = grDevices::colorRampPalette(c(&quot;#acc484&quot;,&quot;#f0eeed&quot;))(4)) %&gt;%
-  add_shadow(lamb_shade(brb_elevation_winner_mat),0.25) %&gt;% 
-  add_overlay(generate_contour_overlay(brb_elevation_winner_mat, color = &quot;#7d4911&quot;, 
-                                       linewidth = 2, levels=seq(min(brb_elevation_winner_mat), max(brb_elevation_winner_mat), by=100)),alphalayer = 0.5) %&gt;% 
-  add_overlay(height_shade(brb_elevation_winner_mat,texture = &quot;white&quot;), alphalayer=0.2)   %&gt;% 
-  add_overlay(generate_label_overlay(brb_stations, extent = extent(brb_elevation_winner_zoom),
-                                     text_size = 3, point_size = 3, color = &quot;black&quot;, 
-                                     halo_color = &quot;#e6e1db&quot;, halo_expand = 5, 
-                                     halo_blur = 2, halo_alpha = 0.8,
-                                     seed=1, heightmap = brb_elevation_winner_mat, 
-                                     data_label_column =&quot;name&quot;)) %&gt;% add_overlay( generate_point_overlay(peaks_points, extent = extent(brb_elevation_winner_zoom),
-                                                                                                         heightmap = brb_elevation_winner_mat,pch=17,size = 3,color=&quot;#312647&quot;) ) %&gt;% 
-  add_overlay(generate_line_overlay(brb_paths$osm_lines,extent = extent(brb_elevation_winner_zoom),
-                                    linewidth = 2, color=&quot;brown&quot;,lty=4, 
-                                    heightmap = brb_elevation_winner_mat)) %&gt;% 
-  add_overlay( generate_point_overlay(winner_point, extent = extent(brb_elevation_winner_zoom),
-                                      heightmap = brb_elevation_winner_mat,pch=4,size = 8,color=&quot;#FC46AA&quot;) )
-  
-  
-
-  
-# plot_winner%&gt;%  plot_3d(brb_elevation_winner_mat,zscale = 2.5, fov = 0, theta = -9, phi = 36, windowsize = c(1000, 800), zoom = 0.6,baseshape = &quot;circle&quot;)
-# 
-# render_snapshot(clear = TRUE,keep_user_par = T,filename = &quot;osterhofen.png&quot;)
-# render_camera()</code></pre>
+<p>Let’s look at the winner station on a map. The winning point to reach
+is highlighted in pink.</p>
 <p><img src="osterhofen.png" style="width:125.0%" /></p>
 <p>I would now like to add two extensions to this simplistic
 solution:</p>
@@ -747,7 +671,7 @@ reached in Bayrischzell when gaining 700 m in elevation.</p>
 </table>
 <p>However, as the following plot shows, Bayrischzell is not the most
 efficient station at all altitude gains. Up to 400 meters, it takes less
-distance starting at the station Tegernsee.
+distance starting at the station Tegernsee:
 <img src="about_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
 <p>The highest average steepness still belongs to Bayrischzell though as
 this table shows:</p>
@@ -845,93 +769,146 @@ this table shows:</p>
 </tr>
 </tbody>
 </table>
-<pre class="r"><code>#####
-# Now: find the peak at least 500m above each station which I can reach the fastes by hiking on actual trails:
-# Download peak data from osm
-# Add elevation data to and sc object with osm_elevation. Probably need to write the elevation data to file first
-#  Select the corresponding to files by using the reference altitude with the peaks (perhaps filter peaks far away to save time)
-# Use dodgr to route from station to selected peaks (why peaks: - summit -need defined to points)
-# Perhaps can add minutes in train on.
-
-
-# peaks downloaded above as peak_points, add elevation data
-# The elevation data is not exactly correct, but I don&#39;t want download at higher resolution/should also not be the biggest problem
-peaks_points &lt;- get_elev_point(peaks_points,src=&quot;aws&quot;,z=12)
-peaks_points &lt;- peaks_points %&gt;% mutate(ele=as.numeric(ele))
-peaks_points &lt;- peaks_points %&gt;% mutate(elevation=if_else(is.na(ele),elevation,ele))
-
-###
-
-
-# Could do this by writing the elevation file from above and adding it in via osm_elevation, but some missing z values in the vertex file which we would likely have to impute
-# first, save elevation to file as .tif:
-# writeRaster(brb_elevation_zoom,&#39;brb_elvation_zoom.tif&#39;,options=c(&#39;TFW=YES&#39;))
-
-
-## --&gt; Try downloading the data from: https://portal.opentopography.org/raster?opentopoID=OTSRTM.082015.4326.1 by entering the coordinates from our bounding box &quot;47.615,11.513,47.881,12.081&quot;
-
-
-
-# For dodgr, we need to download all the key=&quot;highway&quot; osmdata which are used in the weighting profile for &quot;foot&quot;
-
-brb_highway_sc &lt;- opq(bbox =brb_bbox) %&gt;% add_osm_feature(key=&quot;highway&quot;) %&gt;% osmdata_sc()
-
-brb_highway_sc &lt;- osm_elevation(brb_highway_sc,&quot;output_SRTMGL1.tif&quot;)
-# ~1.9% missing z_  at this point
-
-
-brb_highway_graph &lt;- weight_streetnet(brb_highway_sc,wt_profile = &quot;foot&quot;,turn_penalty = F)
-
-
-## Now: function for mclappply:
-
-# calculate distance matrix to restrict routing to peaks which are somewhat close perhaps to closest 10 peaks? 
-from &lt;- data.frame(brb_stations%&gt;% dplyr::select(X,Y) %&gt;% st_drop_geometry())
-to &lt;- data.frame(peaks_points %&gt;% dplyr::select(X,Y) %&gt;% st_drop_geometry())
-
-# want to iterate over the from values
-              # peak_one_row &lt;- function(row,elevation_gain,n_peaks) {
-              #   reference_altitude &lt;- row$elevation+elevation_gain
-              #   temp &lt;- from_to_matrix %&gt;% filter(osm_id==row$osm_id) %&gt;% dplyr::select(-osm_id)
-              #   temp &lt;- peaks_points %&gt;% mutate(distance_rank=rank(temp))
-              #   temp &lt;- temp %&gt;% filter(elevation&gt;=reference_altitude)
-              #   # Have to calculate rank again here to get rank among those peaks higher than the reference_altitude (probably can improve this)
-              #   temp &lt;- temp %&gt;% mutate(distance_rank=rank(distance_rank))
-              #   temp &lt;- temp %&gt;% filter(distance_rank&lt;=n_peaks)
-              #   to &lt;- data.frame(temp %&gt;% dplyr::select(X,Y) %&gt;% st_drop_geometry())
-              #   from &lt;- row %&gt;% data.frame() %&gt;% dplyr::select(X,Y) %&gt;% st_drop_geometry()
-              #   distances&lt;- dodgr_distances (brb_highway_graph, from = from, to = to, shortest = T)
-              #   distances
-              # }
-              # 
-              # out &lt;- mclapply(brb_stations_list[1:2],peak_one_row,elevation_gain=500,n_peaks=5,mc.cores = 4)
-
-times_to &lt;- dodgr_distances (brb_highway_graph, from = from, to = to, shortest = T)
-# Have literally zero clue why the fuck this does not work
-not_work &lt;- peaks_points %&gt;% filter(!osm_id%in%colnames(times_to))
-to_not_work &lt;- not_work  %&gt;% dplyr::select(X,Y) %&gt;% st_drop_geometry()
-times_not_work &lt;- dodgr_distances (brb_highway_graph, from = from, to = to_not_work, shortest = T)
-combine &lt;- cbind(times_to,times_not_work)
-# Find out why some peaks only have NAs, these seem to mostly not paths
-only_na &lt;- colnames(combine)[!complete.cases(t(combine))]
-peaks_points %&gt;% filter(osm_id==1200501391) %&gt;% view()
-
-# Sort combine in the order of the the peak_points data
-combine &lt;- combine[ , peaks_points$osm_id]
-#### Does not exactly work yet
-# make altitude difference matrix/booleamatrix
-reference_altitude_boolean_matrix &lt;- -outer(brb_stations$elevation,peaks_points$elevation,&quot;-&quot;) &gt;1000
-temp&lt;- reference_altitude_boolean_matrix*combine
-
-temp[temp == 0]=NA
-
-brb_stations$min_dist_peak &lt;- apply(temp, 1, FUN = min, na.rm = TRUE)
-brb_stations$min_dist_peak_index &lt;- apply(temp, 1, which.min)
-# Still want to get the names and the coordinates, and elevation (distance)
-brb_stations$min_dist_peak_name &lt;- peaks_points[brb_stations$min_dist_peak_index,]$name
-brb_stations$min_dist_peak_elevation &lt;- peaks_points[brb_stations$min_dist_peak_index,]$elevation
-brb_stations &lt;- brb_stations %&gt;% mutate(min_dist_peak_elevation_difference=min_dist_peak_elevation-elevation)
-# </code></pre>
+<pre class="r"><code>brb_stations %&gt;% dplyr::select(name,min_dist_peak_name,min_dist_peak,min_dist_peak_elevation_difference) %&gt;% st_drop_geometry() %&gt;% arrange(min_dist_peak) %&gt;% knitr::kable(row.names = F,col.names = c(&quot;Station name&quot;,&quot;Peak name&quot;,&quot;Distance&quot;,&quot;Elevation distance&quot;))</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Station name</th>
+<th align="left">Peak name</th>
+<th align="right">Distance</th>
+<th align="right">Elevation distance</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Bayrischzell</td>
+<td align="left">Wendelstein</td>
+<td align="right">5756.869</td>
+<td align="right">1032</td>
+</tr>
+<tr class="even">
+<td align="left">Osterhofen (Oberbay)</td>
+<td align="left">Wendelstein</td>
+<td align="right">6057.653</td>
+<td align="right">1033</td>
+</tr>
+<tr class="odd">
+<td align="left">Fischbachau</td>
+<td align="left">Aiplspitz</td>
+<td align="right">6661.403</td>
+<td align="right">1003</td>
+</tr>
+<tr class="even">
+<td align="left">Geitau</td>
+<td align="left">Wendelstein</td>
+<td align="right">6837.118</td>
+<td align="right">1058</td>
+</tr>
+<tr class="odd">
+<td align="left">Fischhausen-Neuhaus</td>
+<td align="left">Lempersberg</td>
+<td align="right">9348.468</td>
+<td align="right">1014</td>
+</tr>
+<tr class="even">
+<td align="left">Lenggries</td>
+<td align="left">Roßstein</td>
+<td align="right">11744.779</td>
+<td align="right">1018</td>
+</tr>
+<tr class="odd">
+<td align="left">Schliersee</td>
+<td align="left">Lempersberg</td>
+<td align="right">13426.962</td>
+<td align="right">1032</td>
+</tr>
+<tr class="even">
+<td align="left">Tegernsee</td>
+<td align="left">Blankenstein</td>
+<td align="right">13616.252</td>
+<td align="right">1006</td>
+</tr>
+<tr class="odd">
+<td align="left">Obergries</td>
+<td align="left">Roßstein</td>
+<td align="right">14945.497</td>
+<td align="right">1031</td>
+</tr>
+<tr class="even">
+<td align="left">Agatharied</td>
+<td align="left">Jägerkamp</td>
+<td align="right">15303.359</td>
+<td align="right">1017</td>
+</tr>
+<tr class="odd">
+<td align="left">Hausham</td>
+<td align="left">Lempersberg</td>
+<td align="right">15810.777</td>
+<td align="right">1057</td>
+</tr>
+<tr class="even">
+<td align="left">Miesbach</td>
+<td align="left">Jägerkamp</td>
+<td align="right">18279.452</td>
+<td align="right">1059</td>
+</tr>
+<tr class="odd">
+<td align="left">Gaißach</td>
+<td align="left">Roßstein</td>
+<td align="right">18782.963</td>
+<td align="right">1031</td>
+</tr>
+<tr class="even">
+<td align="left">Gmund</td>
+<td align="left">Blankenstein</td>
+<td align="right">18877.650</td>
+<td align="right">1029</td>
+</tr>
+<tr class="odd">
+<td align="left">Finsterwald</td>
+<td align="left">Blankenstein</td>
+<td align="right">19573.087</td>
+<td align="right">1001</td>
+</tr>
+<tr class="even">
+<td align="left">Moosrain</td>
+<td align="left">Blankenstein</td>
+<td align="right">21393.072</td>
+<td align="right">1009</td>
+</tr>
+<tr class="odd">
+<td align="left">Bad Tölz</td>
+<td align="left">Roßstein</td>
+<td align="right">21567.387</td>
+<td align="right">1010</td>
+</tr>
+<tr class="even">
+<td align="left">Reichersbeuern</td>
+<td align="left">Wallberg</td>
+<td align="right">24053.739</td>
+<td align="right">1003</td>
+</tr>
+<tr class="odd">
+<td align="left">Warngau</td>
+<td align="left">Wallberg</td>
+<td align="right">25941.121</td>
+<td align="right">1006</td>
+</tr>
+<tr class="even">
+<td align="left">Schaftlach</td>
+<td align="left">Blankenstein</td>
+<td align="right">26513.270</td>
+<td align="right">1008</td>
+</tr>
+<tr class="odd">
+<td align="left">Darching</td>
+<td align="left">Brecherspitz</td>
+<td align="right">27503.781</td>
+<td align="right">1022</td>
+</tr>
+</tbody>
+</table>
+<p>```</p>
 </div>
 </div>
 
