@@ -24,7 +24,7 @@ The goal of this project is mainly to practice using OpenStreetMap data and calc
 
 First, I load train stations and railway lines from OpenStreetMap in the bounding box of interest which represent train stations in the local mountains which I can reach within roughly an hour.
 
-```{r include=T}
+```{r test, echo=F}
 # To manually get the correct bounding box from a map
 
 # https://norbertrenner.de/osm/bbox.html
@@ -58,9 +58,9 @@ ggplot(brb_rails)+geom_sf(lty="dashed")+geom_sf(data = brb_stations)+geom_sf_tex
 
 ```
 
-Next, I want to load additional data on lakes and peaks from OSM for further plots and calculations:
+Next, I want to load additional data on lakes and peaks from OSM for further plots and calculations.
 
-```{r}
+```{r echo=F}
 # Lakes come in both polygon and multipolygons in the osm data (depends on whether the lake is just one surface or has a smaller additional parrt)
 lakes <- opq(bbox =brb_bbox) %>% add_osm_feature(key="water",value="lake") %>% osmdata_sf()
 lakes_poly <- lakes$osm_polygons %>% filter(!is.na(name))
@@ -76,7 +76,7 @@ peaks_points <- peaks$osm_points %>% filter(!is.na(name))
 peaks_points <- peaks_points %>% cbind(st_coordinates(peaks_points))
 ```
 
-Next, I want to load elevation data for the bounding box which I am looking at using the package [elevatr](https://github.com/jhollist/elevatr).
+Then, I want to load elevation data for the bounding box which I am looking at using the package [elevatr](https://github.com/jhollist/elevatr).
 
 ```{r}
 brb_elevation <- get_elev_raster(locations = brb_stations , z=11)
@@ -176,7 +176,7 @@ brb_stations <- cbind(brb_stations,out)
 
 ```
 
-The optimal station for 750 meters of elevation gain is: Osterhofen where you can ascend 750 m in 2.29 km. 
+The optimal station for 750 meters of elevation gain is: Osterhofen where you can ascend 750 m in 2.29 km:
 ```{r echo=F, results='asis'}
 # brb_stations %>%dplyr::select(name,elevation,distance_750) %>% st_drop_geometry()%>% arrange(distance_750) %>% knitr::kable(row.names = F,col.names = c("Station name","Station elevation (m)","Distance to closest point 750 m higher (m)")) 
 
@@ -184,12 +184,13 @@ The optimal station for 750 meters of elevation gain is: Osterhofen where you ca
 brb_stations %>% dplyr::select(name,elevation,distance_750) %>% st_drop_geometry() %>% reactable::reactable(
   bordered = T,
   highlight = T,
+  rownames = F,
   defaultPageSize = 10,
   defaultSorted = list(distance_750="asc"),
   columns = list(
     name = colDef(name = "Station name", align = "left",filterable = T),
     elevation = colDef(name = "Station elevation (m)", format =colFormat(digits = 0)),
-    distance_750 = colDef(name = "Distance to closest point 750 m higher (m)")
+    distance_750 = colDef(name = "Distance to closest point 750 m higher (m)", format =colFormat(digits = 0))
   ))
 ```
 Let's look at the winner station on a map. The winning point to reach is highlighted in pink.
@@ -229,10 +230,10 @@ plot_winner <-  brb_elevation_winner_mat %>%
                                      data_label_column ="name")) %>% add_overlay( generate_point_overlay(peaks_points, extent = extent(brb_elevation_winner_zoom),
                                                                                                          heightmap = brb_elevation_winner_mat,pch=17,size = 3,color="#312647") ) %>% 
   add_overlay(generate_line_overlay(brb_paths$osm_lines,extent = extent(brb_elevation_winner_zoom),
-                                    linewidth = 2, color="brown",lty=4, 
+                                    linewidth = 3.5, color="brown",lty=4, 
                                     heightmap = brb_elevation_winner_mat)) %>% 
   add_overlay( generate_point_overlay(winner_point, extent = extent(brb_elevation_winner_zoom),
-                                      heightmap = brb_elevation_winner_mat,pch=4,size = 8,color="#FC46AA") )
+                                      heightmap = brb_elevation_winner_mat,pch=4,size = 11,color="#FC46AA") )
   
   
 
@@ -348,7 +349,7 @@ data_dist %>%  group_by(name) %>%
   ))
 
 ```
-As for the second extension, this table shows which peaks can be reached along the trail network:
+As for the second extension, this table shows the peak at least 1000 meter higher than the respective stations which is closest along the trail network.
 ```{r echo=F }
 #####
 # Now: find the peak at least 500m above each station which I can reach the fastes by hiking on actual trails:
